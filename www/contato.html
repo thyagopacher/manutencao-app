@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Contato</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="css/login.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/sweetalert.min.css">
+        <link rel="icon" type="image/x-icon" href="img/icon.png">
+        <meta name="theme-color" content="#357CA8">
+    </head>
+    <body>
+        <div class="container">  
+            <h3>Tela de contato</h3>
+            <form id="fcontato" method="post" onsubmit="return false;">
+                <input type="hidden" name="imagem" id="imagem" value="">
+                <input type="hidden" name="qrcode" id="qrcode" value="">
+                <input type="hidden" name="codpessoa" id="codpessoa" value="">
+                <div id="pergunta_foto" style="display: none"  Title="Tipo foto?"></div>
+                <div class="form-group">
+                    <label>Mensagem</label>
+                    <textarea rows="10" class="form-control" name="mensagem" id="mensagem" placeholder="Digite o mensagem" required maxlength="200"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Imagem</label>
+                    <img class="form-control" onclick="capturePhoto();" id="imagem_captura" style="width: 180px;margin: 30px 0px 10px 55px;cursor: pointer;height: auto;" src="img/camera.png" alt="Tirar foto"/>
+                </div>
+                <div class="form-group">
+                    <button type="submit" onclick="enviarContato();" id="btEnviar" class="btn btn-default">Enviar</button>
+                </div>
+            </form>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/sweetalert.min.js"></script>        
+        <script type="text/javascript">
+                        $("#qrcode").val(localStorage.getItem('ultQrCodeLido'));
+                        $("#codpessoa").val(localStorage.getItem('codpessoa'));
+
+                        // Wait for device API libraries to load
+                        document.addEventListener("deviceready", onDeviceReady, false);
+
+                        // device APIs are available
+                        function onDeviceReady() {
+                            pictureSource = navigator.camera.PictureSourceType;
+                            destinationType = navigator.camera.DestinationType;
+                        }
+
+                        // Called when a photo is successfully retrieved
+                        function onPhotoDataSuccess(imageData) {
+                            // Uncomment to view the base64-encoded image data
+                            // console.log(imageData);
+
+                            // Get image handle
+                            //
+                            var smallImage = document.getElementById('imagem_captura');
+
+                            // Unhide image elements
+                            //
+                            smallImage.style.display = 'block';
+
+                            // Show the captured photo
+                            // The inline CSS rules are used to resize the image
+                            //
+                            smallImage.src = "data:image/png;base64," + imageData;
+                            document.getElementById("imagem").value = "data:image/png;base64," + imageData;
+                        }
+
+                        // Called when a photo is successfully retrieved
+                        function onPhotoURISuccess(imageURI) {
+                            document.getElementById('imagem_captura').src = "data:image/png;base64," + imageURI;
+                            document.getElementById("imagem").value = "data:image/png;base64," + imageURI;
+//                            alert(imageURI);
+                        }
+
+                        // A button will call this function
+                        function capturePhoto() {
+                            $(function () {
+                                $("#pergunta_foto").dialog({
+                                    resizable: false,
+                                    height: 140,
+                                    modal: true,
+                                    buttons: {
+                                        "Tire foto": function () {
+                                            navigator.camera.getPicture(onPhotoDataSuccess, onFail, {quality: 50, destinationType: Camera.DestinationType.DATA_URL});
+                                            $(this).dialog("close");
+                                        },
+                                        "Busque nos arquivos": function () {
+                                            navigator.camera.getPicture(onPhotoURISuccess, onFail, {quality: 50,
+                                                destinationType: Camera.DestinationType.DATA_URL,
+                                                sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+                                            $(this).dialog("close");
+                                        }
+                                    }
+                                });
+                            });
+                        }
+
+                        // Called if something bad happens.
+                        function onFail(message) {
+                            console.log("Erro ao carregar a foto causado por: " + message);
+                        }
+
+        </script>
+    </body>
+</html>
